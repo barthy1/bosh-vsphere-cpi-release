@@ -44,6 +44,29 @@ context 'given cpis that are configured to use VSAN datastores', vsan_datastore:
     VSphereCloud::Cloud.new(options)
   end
 
+  it 'DETE_ME' do
+    begin
+      # vsan_stemcell_id = upload_stemcell(vsan_cpi)
+      vsan_stemcell_id = 'sc-ae5bd22e-70ba-442f-9bfe-85399b8acd69'
+
+      @vm_id = vsan_cpi.create_vm(
+        'agent-007',
+        vsan_stemcell_id,
+        resource_pool,
+        network_spec,
+        [],
+        {}
+      )
+
+      @disk_id = vsan_cpi.create_disk(2048, {'type' => 'thin'}, @vm_id)
+      expect(@disk_id).to_not be_nil
+
+      vsan_cpi.attach_disk(@vm_id, @disk_id)
+    ensure
+      # delete_stemcell(vsan_cpi, vsan_stemcell_id)
+    end
+  end
+
   it 'should exercise the vm lifecycle with a vsan stemcell' do
     begin
       vsan_stemcell_id = upload_stemcell(vsan_cpi)

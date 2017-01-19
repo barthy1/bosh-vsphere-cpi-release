@@ -22,22 +22,31 @@ module VSphereCloud
         "[#{@datastore.name}] #{@folder}/#{@cid}.vmdk"
       end
 
-      def create_disk_attachment_spec(disk_controller_id:)
+      def create_disk_attachment_spec(disk_controller_id:, existing_disk:)
         virtual_disk = Helpers::Disks.create_virtual_disk(
           disk_controller_id: disk_controller_id,
           size_in_mb: @size_in_mb,
-          backing: create_persistent_backing,
+          backing: create_persistent_backing(existing_disk),
         )
+        virtual_disk.capacity_in_kb = 0
 
-        Resources::VM.create_add_device_spec(virtual_disk)
+        device_config_spec = Resources::VM.create_add_device_spec(virtual_disk)
+        device_config_spec.file_operation = VimSdk::Vim::Vm::Device::VirtualDeviceSpec::FileOperation::CREATE
+
+        device_config_spec
       end
 
       private
 
-      def create_persistent_backing
+      def create_persistent_backing(existing_disk)
+        parent_backing_info = VimSdk::Vim::Vm::Device::VirtualDisk::FlatVer2BackingInfo.new
+        parent_backing_info.datastore = @datastore.mob
+        parent_backing_info.file_name = '[vsanDatastore-Cluster-01] acfe8058-d8f9-c82d-cb6f-842b2b08feba/disk-479262c2-d076-4cd1-9049-683276f70044.vmdk'
+
         backing_info = VimSdk::Vim::Vm::Device::VirtualDisk::FlatVer2BackingInfo.new
         backing_info.datastore = @datastore.mob
-        backing_info.file_name = path
+        backing_info.file_name = path.gsub(/\.vmdk/, '_1.vmdk')
+        backing_info.parent = parent_backing_info
 
         backing_info.disk_mode = VimSdk::Vim::Vm::Device::VirtualDiskOption::DiskMode::INDEPENDENT_PERSISTENT
 

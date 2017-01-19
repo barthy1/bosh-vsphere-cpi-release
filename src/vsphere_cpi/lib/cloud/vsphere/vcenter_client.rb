@@ -341,8 +341,8 @@ module VSphereCloud
     end
 
     def add_persistent_disk_property_to_vm(vm, disk)
-      vm_disk = vm.disk_by_cid(disk.cid)
-      disk_device_key = vm_disk.key
+      # disk_device_key = vm_disk.key
+      disk_device_key = '2002'
 
       if vm.get_vapp_property_by_key(disk_device_key) != nil
         @logger.debug("Disk property already exists '#{disk.cid}' on vm '#{vm.cid}'")
@@ -351,11 +351,14 @@ module VSphereCloud
 
       v_app_property_info = VimSdk::Vim::VApp::PropertyInfo.new
       v_app_property_info.key = disk_device_key
-      v_app_property_info.id = disk.cid
-      v_app_property_info.label = disk.cid
+      # v_app_property_info.id = disk.cid
+      # v_app_property_info.label = disk.cid
+      v_app_property_info.id = 'fake-cid'
+      v_app_property_info.label = 'fake-cid'
       v_app_property_info.category = 'BOSH Persistent Disks'
       v_app_property_info.type = 'string'
-      v_app_property_info.value = disk.path
+      # v_app_property_info.value = disk.path
+      v_app_property_info.value = 'fake-path'
       v_app_property_info.description = 'Used by BOSH to track persistent disks. Change at your own risk.'
       v_app_property_info.user_configurable = true
 

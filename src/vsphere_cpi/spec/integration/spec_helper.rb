@@ -17,7 +17,7 @@ RSpec.configure do |rspec_config|
     Dir.mktmpdir do |temp_dir|
       stemcell_image = stemcell_image(@stemcell_path, temp_dir)
       # stemcell uploads are slow on local vSphere, only upload once
-      stemcell_id = @suite_cpi.create_stemcell(stemcell_image, nil)
+      # stemcell_id = @suite_cpi.create_stemcell(stemcell_image, nil)
     end
   end
 
@@ -26,7 +26,7 @@ RSpec.configure do |rspec_config|
     fetch_global_properties
 
     @cpi = VSphereCloud::Cloud.new(cpi_options)
-    @stemcell_id = stemcell_id
+    # @stemcell_id = stemcell_id
   end
 
   rspec_config.after(:all) do
@@ -34,6 +34,6 @@ RSpec.configure do |rspec_config|
   end
 
   rspec_config.after(:suite) do
-    delete_stemcell(@suite_cpi, stemcell_id)
+    # delete_stemcell(@suite_cpi, stemcell_id)
   end
 end
